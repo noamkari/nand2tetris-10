@@ -5,7 +5,58 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+import re
 import typing
+
+
+def find_quoted_substrings(s: str):
+    """"
+    to handle with comment in string s.t: "hi // this is not a comment"
+    """
+    start_index = None
+    quote_char = None
+
+    num_of_string = 0
+    dct = {}
+
+    for i, c in enumerate(s):
+        if c == '"' or c == "'":
+            if start_index is None:
+                # start of a quoted substring
+                start_index = i
+                quote_char = c
+            elif quote_char == c:
+                # end of a quoted substring
+
+                tmp_id = f"STR:{num_of_string}"
+                dct[tmp_id] = s[start_index:i + 1]
+
+                num_of_string += 1
+
+                start_index = None
+                quote_char = None
+
+    for key, val in dct.items():
+        s = s.replace(val, key)
+
+    return s, dct
+
+
+def remove_comments(jack_file):
+    # We will use a regular expression to match the three possible comment formats
+
+    jack_file, dct = find_quoted_substrings(jack_file)
+    regex = r"/\*(.|\n)*?\*/|/\*\*(.|\n)*?\*/|//(.|\n)*?\n"
+
+    # Replace all matches with an empty string
+    jack_file = re.sub(regex, "", jack_file)
+    out_list = jack_file.split()
+
+    for s in out_list:
+        if s in dct:
+            s = s.replace(s, dct[s])
+
+    return out_list
 
 
 class JackTokenizer:
@@ -101,7 +152,14 @@ class JackTokenizer:
         # Your code goes here!
         # A good place to start is to read all the lines of the input:
         # input_lines = input_stream.read().splitlines()
-        pass
+
+        self._input_lines = remove_comments(input_stream.read())
+
+        self.dct_token_type = {"KEYWORD",
+                               "SYMBOL",
+                               "IDENTIFIER",
+                               "INT_CONST",
+                               "STRING_CONST"}
 
     def has_more_tokens(self) -> bool:
         """Do we have more tokens in the input?
@@ -109,8 +167,7 @@ class JackTokenizer:
         Returns:
             bool: True if there are more tokens, False otherwise.
         """
-        # Your code goes here!
-        pass
+        return self.cur < len(self.input_lines)
 
     def advance(self) -> None:
         """Gets the next token from the input and makes it the current token. 
@@ -118,7 +175,7 @@ class JackTokenizer:
         Initially there is no current token.
         """
         # Your code goes here!
-        pass
+        self.cur += 1
 
     def token_type(self) -> str:
         """
