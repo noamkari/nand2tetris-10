@@ -7,13 +7,13 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 
-
 KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
            'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
            'false', 'null', 'this', 'let', 'do', 'if', 'else',
            'while', 'return']
 SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
            '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
+
 
 class JackTokenizer:
     """Removes all comments from the input stream and breaks it
@@ -138,11 +138,11 @@ class JackTokenizer:
         if cur_token in KEYORDS:
             return "KEYWORD"
         elif cur_token in SYMBOLS:
-            return  "SYMBOL"
+            return "SYMBOL"
         elif all(c.isdigit() for c in cur_token):
             return "INT_CONST"
         if (cur_token.startswith("'") and cur_token.endswith("'")) or (
-                    cur_token.startswith('"') and cur_token.endswith('"')):
+                cur_token.startswith('"') and cur_token.endswith('"')):
             return "STRING_CONST"
         else:
             return "IDENTIFIER"
@@ -206,7 +206,3 @@ class JackTokenizer:
         """
         # Your code goes here!
         return self.input_line[self.cur].replace("\n", "")[1:-1]
-
-
-
-
