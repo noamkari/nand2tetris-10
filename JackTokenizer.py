@@ -160,8 +160,8 @@ class JackTokenizer:
         # A good place to start is to read all the lines of the input:
         # input_lines = input_stream.read().splitlines()
 
-        self.cur = 0
         self._input_lines = remove_comments(input_stream.read())
+
         self.dct_token_type = {"KEYWORD",
                                "SYMBOL",
                                "IDENTIFIER",
@@ -174,7 +174,7 @@ class JackTokenizer:
         Returns:
             bool: True if there are more tokens, False otherwise.
         """
-        return self.cur < len(self._input_lines)
+        return self.cur < len(self.input_lines)
 
     def advance(self) -> None:
         """Gets the next token from the input and makes it the current token. 
@@ -191,7 +191,7 @@ class JackTokenizer:
             "KEYWORD", "SYMBOL", "IDENTIFIER", "INT_CONST", "STRING_CONST"
         """
         # Your code goes here!
-        cur_token = self._input_lines[self.cur]
+        cur_token = self.input_line[self.cur]
         if cur_token in KEYORDS:
             return "KEYWORD"
         elif cur_token in SYMBOLS:
@@ -214,7 +214,7 @@ class JackTokenizer:
             "IF", "ELSE", "WHILE", "RETURN", "TRUE", "FALSE", "NULL", "THIS"
         """
         # Your code goes here!
-        return self._input_lines[self.cur].upper()
+        return self.input_line[self.cur].upper()
 
     def symbol(self) -> str:
         """
@@ -226,7 +226,7 @@ class JackTokenizer:
               '-' | '*' | '/' | '&' | '|' | '<' | '>' | '=' | '~' | '^' | '#'
         """
         # Your code goes here!
-        return self._input_lines[self.cur]
+        return self.input_line[self.cur]
 
     def identifier(self) -> str:
         """
@@ -239,7 +239,7 @@ class JackTokenizer:
                   identifiers, so 'self' cannot be an identifier, etc'.
         """
         # Your code goes here!
-        return self._input_lines[self.cur]
+        return self.input_line[self.cur]
 
     def int_val(self) -> int:
         """
@@ -250,7 +250,7 @@ class JackTokenizer:
             integerConstant: A decimal number in the range 0-32767.
         """
         # Your code goes here!
-        return int(self._input_lines[self.cur])
+        return int(self.input_line[self.cur])
 
     def string_val(self) -> str:
         """
@@ -262,4 +262,4 @@ class JackTokenizer:
                       double quote or newline '"'
         """
         # Your code goes here!
-        return self._input_lines[self.cur].replace("\n", "")[1:-1]
+        return self.input_line[self.cur].replace("\n", "")[1:-1]
