@@ -8,6 +8,13 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 import re
 import typing
 
+KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
+           'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
+           'false', 'null', 'this', 'let', 'do', 'if', 'else',
+           'while', 'return']
+SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
+           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
+
 
 def find_quoted_substrings(s: str):
     """"
@@ -184,7 +191,18 @@ class JackTokenizer:
             "KEYWORD", "SYMBOL", "IDENTIFIER", "INT_CONST", "STRING_CONST"
         """
         # Your code goes here!
-        pass
+        cur_token = self.input_line[self.cur]
+        if cur_token in KEYORDS:
+            return "KEYWORD"
+        elif cur_token in SYMBOLS:
+            return "SYMBOL"
+        elif all(c.isdigit() for c in cur_token):
+            return "INT_CONST"
+        if (cur_token.startswith("'") and cur_token.endswith("'")) or (
+                cur_token.startswith('"') and cur_token.endswith('"')):
+            return "STRING_CONST"
+        else:
+            return "IDENTIFIER"
 
     def keyword(self) -> str:
         """
@@ -196,7 +214,7 @@ class JackTokenizer:
             "IF", "ELSE", "WHILE", "RETURN", "TRUE", "FALSE", "NULL", "THIS"
         """
         # Your code goes here!
-        pass
+        return self.input_line[self.cur].upper()
 
     def symbol(self) -> str:
         """
@@ -208,7 +226,7 @@ class JackTokenizer:
               '-' | '*' | '/' | '&' | '|' | '<' | '>' | '=' | '~' | '^' | '#'
         """
         # Your code goes here!
-        pass
+        return self.input_line[self.cur]
 
     def identifier(self) -> str:
         """
@@ -221,7 +239,7 @@ class JackTokenizer:
                   identifiers, so 'self' cannot be an identifier, etc'.
         """
         # Your code goes here!
-        pass
+        return self.input_line[self.cur]
 
     def int_val(self) -> int:
         """
@@ -232,7 +250,7 @@ class JackTokenizer:
             integerConstant: A decimal number in the range 0-32767.
         """
         # Your code goes here!
-        pass
+        return int(self.input_line[self.cur])
 
     def string_val(self) -> str:
         """
@@ -244,4 +262,4 @@ class JackTokenizer:
                       double quote or newline '"'
         """
         # Your code goes here!
-        pass
+        return self.input_line[self.cur].replace("\n", "")[1:-1]
