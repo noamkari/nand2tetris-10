@@ -263,3 +263,16 @@ class JackTokenizer:
         """
         # Your code goes here!
         return self._input_lines[self.cur].replace("\n", "")[1:-1]
+
+
+    def cur_token(self):
+        if self.token_type() == "KEYWORD":
+            return self.keyword()
+        if self.token_type() == "SYMBOL":
+            return self.symbol()
+        if self.token_type() == "IDENTIFIER":
+            return self.identifier()
+        if self.token_type() == "INT_CONST":
+            return self.int_val()
+        if self.token_type() == "STRING_CONST":
+            return self.string_val()
