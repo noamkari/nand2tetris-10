@@ -8,12 +8,12 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 import re
 import typing
 
-KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
+KEYORDS = {'class', 'constructor', 'function', 'method', 'field',
            'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
            'false', 'null', 'this', 'let', 'do', 'if', 'else',
-           'while', 'return']
-SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
-           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
+           'while', 'return'}
+SYMBOLS = {'{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '|', '&'
+    , '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#'}
 
 
 def find_quoted_substrings(s: str):
@@ -35,7 +35,7 @@ def find_quoted_substrings(s: str):
             elif quote_char == c:
                 # end of a quoted substring
 
-                tmp_id = f"STR:{num_of_string}"
+                tmp_id = f"STR{num_of_string}"
                 dct[tmp_id] = s[start_index:i + 1]
 
                 num_of_string += 1
@@ -49,21 +49,35 @@ def find_quoted_substrings(s: str):
     return s, dct
 
 
+def r(input_string):
+    # input_string = re.sub(r'/\*.*?\*/', '', input_string, flags=re.DOTALL)
+    # # Replace /** API comment until closing */ with an empty string
+    # input_string = re.sub(r'/\*\*.*?\*/', '', input_string, flags=re.DOTALL)
+    # # Replace // comment until the line's end with an empty string
+    # input_string = re.sub(r'//.*', '', input_string)
+    #
+    input_string = re.sub(r'//[^\n]*\n|/\*(.*?)\*/','', input_string, flags=re.DOTALL)
+
+    return input_string
+
+
 def remove_comments(jack_file):
     # We will use a regular expression to match the three possible comment formats
 
-    jack_file, dct = find_quoted_substrings(jack_file)
-    regex = r"/\*(.|\n)*?\*/|/\*\*(.|\n)*?\*/|//(.|\n)*?\n"
+    # jack_file, dct = find_quoted_substrings(jack_file)
+    # regex = r"(//.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)"
+    #
+    # # Replace all matches with an empty string
+    # jack_file = re.sub(regex, "", jack_file)
 
-    # Replace all matches with an empty string
-    jack_file = re.sub(regex, "", jack_file)
-    # out_list = jack_file.split()
+    jack_file = r(jack_file)
+
     out_list = re.findall(
-        r'[\w]+|[*\{\}()\[\].,;+\\\-&/|<>=~\?]|[\"\'].+[\"\']', jack_file)
+        r"[\w]+|[*\{\}()\[\].,;+\\\-&/|<>=~\?]|[\"\'].+[\"\']", jack_file)
 
-    for s in out_list:
-        if s in dct:
-            s = s.replace(s, dct[s])
+    # for i in range(len(out_list)):
+    #     if out_list[i] in dct:
+    #         out_list[i] = dct[out_list[i]]
 
     return out_list
 
