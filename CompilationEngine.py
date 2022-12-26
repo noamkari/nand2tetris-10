@@ -60,6 +60,7 @@ class CompilationEngine:
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
         # Your code goes here!
+        self._output_stream.write("<classVarDec>\n")
         self.write_token()  # static or field
         self.write_token()  # var type
         self.write_token()  # var name
@@ -67,6 +68,7 @@ class CompilationEngine:
             self.write_token()  # ","
             self.write_token()  # var name
         self.write_token()  # ;
+        self._output_stream.write("</classVarDec>\n")
 
     def compile_subroutine(self) -> None:
         """
