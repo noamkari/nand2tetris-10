@@ -5,8 +5,11 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
-import typing
-#try
+
+import JackTokenizer
+
+
+# try
 
 class CompilationEngine:
     """Gets input from a JackTokenizer and emits its parsed structure into an
@@ -25,44 +28,61 @@ class CompilationEngine:
         # output_stream.write("Hello world! \n")
         self._output_stream = output_stream
         self._input_stream = input_stream
+
         self.type_dict = {"KEYWORD": "keyword", "SYMBOL": "symbol",
-                     "INT_CONST": "integerConstant",
-                     "STRING_CONST": "stringConstant", "IDENTIFIER": "identifier"}
-        self.binary_op = {'+', '-', '*', '/', '|', '=', '&lt;', '&gt;', '&amp;'}
+                          "INT_CONST": "integerConstant",
+                          "STRING_CONST": "stringConstant",
+                          "IDENTIFIER": "identifier"}
+        self.binary_op = {'+', '-', '*', '/', '|', '=', '&lt;', '&gt;',
+                          '&amp;'}
         self.unary_op = {'-', '~'}
         self.keyword_constant = {'true', 'false', 'null', 'this'}
         self.classVarDec = ['static', 'field']
         self.subroutineDec = ['constructor', 'method', 'function']
 
+        self.keyword = {'boolean', 'class', 'int', 'void'}
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
         # Your code goes here!
-        self._output_stream.write("<class>\n")
-        self.write_token() # class
+
+        # while self._input_stream.has_more_tokens():
+        #     self._input_stream.advance()
+        #
+        #     if self._input_stream.cur_token() in self.keyword:
+        #         self._output_stream.write()
+        #
+        #     if self._input_stream.cur_token() in self.classVarDec:
+        #         self.compile_class_var_dec()
+        #     if self._input_stream.cur_token() in self.subroutineDec:
+        #         self.compile_subroutine()
+
+        self._output_stream.write("<tokens>\n")
+        self.write_token()  # class
         self.write_token()  # class_name
         self.write_token()  # {
-        if self._input_stream.cur_token() in self.classVarDec:
-            self.compile_class_var_dec()
-        if self._input_stream.cur_token() in self.subroutineDec:
-            self.compile_subroutine()
+        while self._input_stream.has_more_tokens():
+            if self._input_stream.cur_token() in self.classVarDec:
+                self.compile_class_var_dec()
+            if self._input_stream.cur_token() in self.subroutineDec:
+                self.compile_subroutine()
         self.write_token()  # }
-        self._output_stream.write("</class>\n")
+        self._output_stream.write("</tokens>\n")
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
         # Your code goes here!
-        self._output_stream.write("<classVarDec>\n")
+        # self._output_stream.write("<classVarDec>\n")
         self.write_token()  # static or field
         self.write_token()  # var type
-        self.write_token()  #  var name
+        self.write_token()  # var name
         while self._input_stream.cur_token() == ",":
-            self.write_token() # ","
-            self.write_token() # var name
-        self.write_token() # ;
-        self._output_stream.write("</classVarDec>\n")
+            self.write_token()  # ","
+            self.write_token()  # var name
+        self.write_token()  # ;
+        # self._output_stream.write("</classVarDec>\n")
 
-    def compile_subroutine(self) -> None: #fixme: im not shure
+    def compile_subroutine(self) -> None:  # fixme: im not shure
         """
         Compiles a complete method, function, or constructor.
         You can assume that classes with constructors have at least one field,
@@ -77,7 +97,7 @@ class CompilationEngine:
         self.compile_parameter_list()
         self.write_token()  # get ')' symbol
         self.compile_subroutine_body()
-        self.write_token() #'}'
+        self.write_token()  # '}'
         self._output_stream.write("</subroutine>\n")
 
     def compile_subroutine_body(self):
@@ -103,11 +123,11 @@ class CompilationEngine:
         """Compiles a var declaration."""
         # Your code goes here!
         self._output_stream.write("<varDec>\n")
-        self.write_token() #var
+        self.write_token()  # var
         self.write_token()  # type
         self.write_token()  # var name
         while self._input_stream.cur_token() == ',':
-            self.write_token() # ","
+            self.write_token()  # ","
             self.write_token()  # var name
         self.write_token()  # ';'
         self._output_stream.write("<varDec>\n")
@@ -120,15 +140,15 @@ class CompilationEngine:
         self._output_stream.write("<statements>\n")
         while self._input_stream.cur_token() in ["let", "if", "while", "do",
                                                  "return"]:
-            if  self._input_stream.cur_token() == "let":
+            if self._input_stream.cur_token() == "let":
                 self.compile_let()
-            elif  self._input_stream.cur_token() == "if":
+            elif self._input_stream.cur_token() == "if":
                 self.compile_if()
-            elif  self._input_stream.cur_token() == "while":
+            elif self._input_stream.cur_token() == "while":
                 self.compile_while()
             elif self._input_stream.cur_token() == "do":
                 self.compile_do()
-            elif  self._input_stream.cur_token() == "return":
+            elif self._input_stream.cur_token() == "return":
                 self.compile_return()
         self._output_stream.write("</statements>\n")
 
@@ -136,17 +156,16 @@ class CompilationEngine:
         """Compiles a do statement."""
         # Your code goes here!
         self._output_stream.write("<doStatement>\n")
-        self.write_token() # do
-        self.write_token() # identifier
+        self.write_token()  # do
+        self.write_token()  # identifier
         while self._input_stream.cur_token() == ".":
-            self.write_token() # '.'
-            self.write_token() # subroutine name
-        self.write_token() # ';'
-        self.write_token() # '('
+            self.write_token()  # '.'
+            self.write_token()  # subroutine name
+        self.write_token()  # ';'
+        self.write_token()  # '('
         self.compile_expression_list()
-        self.write_token() # ')'
+        self.write_token()  # ')'
         self._output_stream.write("<doStatement>\n")
-
 
     def compile_let(self) -> None:
         """Compiles a let statement."""
@@ -183,7 +202,7 @@ class CompilationEngine:
         self.write_token()  # return
         while self._input_stream.cur_token() == '(':
             self.compile_expression()
-        self.write_token() # ';'
+        self.write_token()  # ';'
         self._output_stream.write("<returnStatement>\n")
 
     def compile_if(self) -> None:
@@ -210,11 +229,11 @@ class CompilationEngine:
         self._output_stream.write("</expression>\n")
         self.compile_term()
         while self._input_stream.cur_token() in self.binary_op:
-            self.write_token() #op
+            self.write_token()  # op
             self.compile_term()
         self._output_stream.write("</expression>\n")
 
-    def compile_term(self) -> None: #fixme: check it works
+    def compile_term(self) -> None:  # fixme: check it works
         """Compiles a term. 
         This routine is faced with a slight difficulty when
         trying to decide between some of the alternative parsing rules.
@@ -237,8 +256,8 @@ class CompilationEngine:
             self.compile_term()
 
         elif self._input_stream.token_type() == "IDENTIFIER":
-            self.write_token() #identifier
-            if self._input_stream.get_cur_token()  == "[":
+            self.write_token()  # identifier
+            if self._input_stream.get_cur_token() == "[":
                 self.write_token()  # [
                 self.compile_expression()
                 self.write_token()  # ]
@@ -246,12 +265,12 @@ class CompilationEngine:
                 self.write_token()  # (
                 self.compile_expression()
                 self.write_token()  # )
-            elif self._input_stream.get_cur_token()  == ".":
+            elif self._input_stream.get_cur_token() == ".":
                 self.write_token()  # '.' symbol
-                self.write_token() # subroutine name
-                self.write_token() # '(' symbol
+                self.write_token()  # subroutine name
+                self.write_token()  # '(' symbol
                 self.compile_expression_list()
-                self.write_token() # ')' symbol
+                self.write_token()  # ')' symbol
 
         elif self._input_stream.get_cur_token() == "(":
             self.write_token()  # (
@@ -260,7 +279,8 @@ class CompilationEngine:
 
         self._output_stream.write("<term>\n")
 
-    def compile_expression_list(self) -> None: #fixme: maybe change the of condition
+    def compile_expression_list(
+            self) -> None:  # fixme: maybe change the of condition
         """Compiles a (possibly empty) comma-separated list of expressions."""
         # Your code goes here!
         self._output_stream.write("</expressionList>\n")
@@ -273,6 +293,9 @@ class CompilationEngine:
 
     def write_token(self):
         type = self.type_dict[self._input_stream.token_type()]
-        token = f"<{type}>{self._input_stream.cur_token()}</{type}>\n"
+        token = f"<{type}> {self._input_stream.cur_token()} </{type}>\n"
         self._output_stream.write(token)
+
+        # fixme print
+        print(token)
         self._input_stream.advance()
