@@ -57,7 +57,8 @@ def remove_comments(jack_file):
 
     # Replace all matches with an empty string
     jack_file = re.sub(regex, "", jack_file)
-    out_list = jack_file.split()
+    # out_list = jack_file.split()
+    out_list = re.findall(r'[\w]+|[*\{\}()\[\].,;+\\\-&/|<>=~\?]|[\"\'].+[\"\']',jack_file)
 
     for s in out_list:
         if s in dct:
@@ -267,7 +268,7 @@ class JackTokenizer:
 
     def cur_token(self):
         if self.token_type() == "KEYWORD":
-            return self.keyword()
+            return self.keyword().lower()
         if self.token_type() == "SYMBOL":
             return self.symbol()
         if self.token_type() == "IDENTIFIER":
