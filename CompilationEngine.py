@@ -31,8 +31,11 @@ class CompilationEngine:
                           "INT_CONST": "integerConstant",
                           "STRING_CONST": "stringConstant",
                           "IDENTIFIER": "identifier"}
-        self.binary_op = {'+', '-', '*', '/', '|', '=', '&lt;', '&gt;',
-                          '&amp;'}
+        # self.binary_op = {'+', '-', '*', '/', '|', '=', '&lt;', '&gt;',
+        #                   '&amp;'}
+        self.binary_op_dct = {'+': '+', '-': '-', '*': '*', '/': '/', '|': '|',
+                              '=': '=', '<': '&lt;', '>': '&gt;', '&': '&amp;'}
+
         self.unary_op = {'-', '~'}
         self.keyword_constant = {'true', 'false', 'null', 'this'}
         self.classVarDec = ['static', 'field']
@@ -182,7 +185,7 @@ class CompilationEngine:
         # Your code goes here!
         # self._output_stream.write("<returnStatement>\n")
         self.write_token()  # return
-        while self._input_stream.cur_token() == '(':
+        while self._input_stream.cur_token() != ';':
             self.compile_expression()
         self.write_token()  # ';'
         # self._output_stream.write("<returnStatement>\n")
@@ -210,7 +213,7 @@ class CompilationEngine:
         # Your code goes here!
         # self._output_stream.write("</expression>\n")
         self.compile_term()
-        while self._input_stream.cur_token() in self.binary_op:
+        while self._input_stream.cur_token() in self.binary_op_dct:
             self.write_token()  # op
             self.compile_term()
         # self._output_stream.write("</expression>\n")
@@ -275,7 +278,12 @@ class CompilationEngine:
 
     def write_token(self):
         type = self.type_dict[self._input_stream.token_type()]
-        token = f"<{type}> {self._input_stream.cur_token()} </{type}>\n"
+
+        if self._input_stream.cur_token() in self.binary_op_dct:
+            t = self.binary_op_dct[self._input_stream.cur_token()]
+        else:
+            t = self._input_stream.cur_token()
+
+        token = f"<{type}> {t} </{type}>\n"
         self._output_stream.write(token)
-        print(token)
         self._input_stream.advance()
