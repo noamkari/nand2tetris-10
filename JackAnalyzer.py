@@ -27,6 +27,7 @@ def analyze_file(
     engine.compile_class()
 
 
+
 if "__main__" == __name__:
     # Parses the input path and calls analyze_file on each input file.
     # This opens both the input and the output files!
